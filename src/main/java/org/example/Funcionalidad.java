@@ -24,12 +24,9 @@ public class Funcionalidad {
      * Funcionalidad principal del juego
      *
      * @param Palabras Array donde estan las palabras separadas
-     * @param Puntos   Obtiene el numero de puntos por parametro
      * @return int devuelve los puntos para poder trabajar con ellos
      */
-    public static void Juego(String[] Palabras, int Puntos) {
-        //int Puntaje = Puntos;
-        //Punt = Puntaje;
+    public static void Juego(String[] Palabras) {
         String Palab = Palabras[NumRandom(Palabras)].toLowerCase();
         char[] Palabra = Palab.toCharArray();
         char[] Oculto = new char[Palabra.length];
@@ -39,14 +36,11 @@ public class Funcionalidad {
             MostrarOculto(Oculto);
             char Letra = Pedirletra();
             Acabado = Comparar(Palabra, Oculto, Letra);
-        } while (Acabado == false);
+        } while (!Acabado);
         System.out.println("Escribiste:");
         MostrarOculto(Oculto);
-        //Puntaje = Punt;
         System.out.println("El juego ha finalizado");
-        //System.out.println("Tu puntaje es " + Puntaje);
         CantErrores = 0;
-        //return Puntaje;
     }
 
     /**
