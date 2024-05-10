@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -26,21 +27,25 @@ public class Funcionalidad {
      * @param Palabras Array donde estan las palabras separadas
      * @return int devuelve los puntos para poder trabajar con ellos
      */
-    public static void Juego(String[] Palabras) {
+    public static void Juego(String[] Palabras, datosVO datos) {
         String Palab = Palabras[NumRandom(Palabras)].toLowerCase();
-        char[] Palabra = Palab.toCharArray();
-        char[] Oculto = new char[Palabra.length];
-        Ocultar(Oculto);
-        Boolean Acabado = false;
-        do {
-            MostrarOculto(Oculto);
-            char Letra = Pedirletra();
-            Acabado = Comparar(Palabra, Oculto, Letra);
-        } while (!Acabado);
+        char[] palabra = Palab.toCharArray();
+        char[] oculto = new char[palabra.length];
+        Ocultar(oculto);
+        datos.setPalabra(palabra);
+        datos.setOculto(oculto);
+    }
+
+    public static void ResultadoJuego(datosVO datos) {
+        if (Arrays.equals(datos.getPalabra(), datos.getOculto())) {
+            datos.setGanador("Ha ganado " + datos.getJugador().getNomJugador());
+            System.out.println(datos.getGanador());
+        }
         System.out.println("Escribiste:");
-        MostrarOculto(Oculto);
+        MostrarOculto(datos.getOculto());
         System.out.println("El juego ha finalizado");
         CantErrores = 0;
+
     }
 
     /**
@@ -74,50 +79,44 @@ public class Funcionalidad {
      * comprueba la cantidad de errores y realiza una u otra tarea dependiendo de
      * esta cantidad
      *
-     * @param Palabra  Array compuesto de los caracteres de una palabra
-     * @param Oculto   Array que cambia los caracteres de una palabra con *
-     * @param Caracter Caracter que introduce el usuario
-     * @return Boolean Este da la señal a otra funcion para que no pida mas
-     *         caracteres
+     * @return boolean Este da la señal a otra funcion para que no pida mas
+     * caracteres
      */
-    public static Boolean Comparar(char[] Palabra, char[] Oculto, char Caracter) {
-        Boolean Acabar = true;
-        Boolean Err = true;
-        String Palab = "";
-        for (int i = 0; i < Palabra.length; i++) {
-            Palab = Palab + Palabra[i];
-            if (Palabra[i] == Caracter) {
-                if (Palabra[i] == Oculto[i]) {
-                    System.out.println("Ya habias puesto esa letra");
-                }
-                Oculto[i] = Caracter;
-                Err = false;
-            }
+    public static boolean Comparar(datosVO datos) {
 
-            if (Palabra[i] != Oculto[i]) {
+        char caracter = datos.getLetra();
+        Jugador jugador = datos.getJugador();
+        jugador.setAtino(false);
+        boolean Acabar = true;
+        boolean Err = true;
+        String Palab = "";
+        for (int i = 0; i < datos.getPalabra().length; i++) {
+            Palab = Palab + datos.getPalabra()[i];
+            if (datos.getPalabra()[i] == caracter) {
+                if (datos.getPalabra()[i] == datos.getOculto()[i]) {
+                    System.out.println("Ya habias puesto esa letra");
+                } else {
+                    datos.getOculto()[i] = caracter;
+                    Err = false;
+                    datos.getJugador().setAtino(true);
+                }
+            }
+            if (datos.getPalabra()[i] != datos.getOculto()[i]) {
                 Acabar = false;
             }
         }
+        if (Arrays.equals(datos.getPalabra(), datos.getOculto())){
+            datos.getJugador().setGanador(true);
+        }
+
         if (Err) {
-            Interficie.mostrarEstat(CantErrores);
             CantErrores = ContError(CantErrores);
+            datos.setCatnError(CantErrores);
         }
         if (CantErrores == 10) {
             Acabar = true;
             System.out.println("La palabra era: " + Palab);
         }
-        /*if (Acabar) {
-            if (CantErrores < 10) {
-                Punt += 5;
-                System.out.println("Se te sumaran 5 puntos");
-
-            } else if (Puntaje > 0 && CantErrores == 10) {
-                Punt -= 5;
-                System.out.println("Se te restaran 5 puntos");
-            }
-
-        }*/
-
         return Acabar;
     }
 
@@ -129,7 +128,7 @@ public class Funcionalidad {
      */
     public static char Pedirletra() {
         String Letr = "";
-        Boolean Correcto = true;
+        boolean Correcto = true;
         do {
             System.out.print("Introduce la letra que creas que esta: ");
             Letr = sc.nextLine();
@@ -145,11 +144,11 @@ public class Funcionalidad {
 
     /**
      * Suma los errores que comete el usuario
+     *
      * @param Errores Cantidad de errores
      * @return int Devuelve la cantidad de errores + 1
      */
     public static int ContError(int Errores) {
         return Errores += 1;
     }
-
 }
